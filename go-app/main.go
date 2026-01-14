@@ -227,7 +227,7 @@ func main() {
 
 	// serve OpenAPI spec file
 	mux.HandleFunc("/openapi.yaml", func(w http.ResponseWriter, r *http.Request) {
-		data, err := os.ReadFile("../openapi.yaml")
+		data, err := os.ReadFile("openapi.yaml")
 		if err != nil {
 			writeError(w, newResponseError(http.StatusNotFound, "openapi spec not found"))
 			return

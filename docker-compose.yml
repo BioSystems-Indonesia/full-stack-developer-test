@@ -7,4 +7,6 @@ services:
     container_name: go_app_8391
     ports:
       - "8391:8391"
+    networks:
+      - app_net
     restart: unless-stopped

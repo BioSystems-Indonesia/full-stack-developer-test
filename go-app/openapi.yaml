@@ -1,0 +1,209 @@
+openapi: 3.0.3
+info:
+  title: Frontend Test API - Patient Service
+  version: 1.0.0
+  description: |
+    This API is provided for a Frontend technical test.
+    The goal is to evaluate the candidate's ability to:
+    - Consume REST APIs
+    - Handle async requests
+    - Manage state
+    - Display data and handle form submission
+servers:
+  - url: http://202.10.35.119:8391
+
+paths:
+  /patients:
+    get:
+      summary: List all patients
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsePatients'
+    post:
+      summary: Create a new patient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientCreate'
+            example:
+              fullname: "Carol Danvers"
+              sex: "F"
+              birthdate: "1990-07-17"
+              address: "Jl. Merdeka 123, Jakarta"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsePatient'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+
+  /patients/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      summary: Get patient by ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsePatient'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+    put:
+      summary: Update a patient (partial allowed)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientUpdate'
+            example:
+              fullname: "Alice A"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsePatient'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+    delete:
+      summary: Delete a patient
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+
+components:
+  schemas:
+    Patient:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        fullname:
+          type: string
+        sex:
+          type: string
+          description: "M or F (or custom)"
+        birthdate:
+          type: string
+          format: date
+        address:
+          type: string
+      required:
+        - id
+        - fullname
+        - sex
+        - birthdate
+        - address
+
+    PatientCreate:
+      type: object
+      properties:
+        fullname:
+          type: string
+        sex:
+          type: string
+        birthdate:
+          type: string
+          format: date
+        address:
+          type: string
+      required:
+        - fullname
+        - sex
+        - birthdate
+        - address
+
+    PatientUpdate:
+      type: object
+      properties:
+        fullname:
+          type: string
+        sex:
+          type: string
+        birthdate:
+          type: string
+          format: date
+        address:
+          type: string
+
+    Response:
+      type: object
+      properties:
+        code:
+          type: integer
+        status:
+          type: string
+        data:
+          type: object
+
+    ResponsePatient:
+      allOf:
+        - $ref: '#/components/schemas/Response'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Patient'
+
+    ResponsePatients:
+      allOf:
+        - $ref: '#/components/schemas/Response'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Patient'
+
+    ResponseError:
+      type: object
+      properties:
+        code:
+          type: integer
+        status:
+          type: string
+        error:
+          type: string
