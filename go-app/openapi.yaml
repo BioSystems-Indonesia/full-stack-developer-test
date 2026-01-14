@@ -10,7 +10,7 @@ info:
     - Manage state
     - Display data and handle form submission
 servers:
-  - url: http://202.10.35.119:8391
+  - url: http://test.fullstack.biosystems.id
 
 paths:
   /patients:
