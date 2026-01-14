@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  go-app:
+    build:
+      context: ./go-app
+    container_name: go_app_8391
+    ports:
+      - "8391:8391"
+    restart: unless-stopped
