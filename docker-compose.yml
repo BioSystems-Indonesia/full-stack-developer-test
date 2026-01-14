@@ -8,5 +8,9 @@ services:
     ports:
       - "8391:8391"
     networks:
-      - app_net
+      - lis-server_app_net
     restart: unless-stopped
+
+networks:
+  lis-server_app_net:
+    external: true
