@@ -5,8 +5,8 @@ services:
     build:
       context: ./go-app
     container_name: go_app_8391
-    ports:
-      - "8391:8391"
+    expose:
+      - "8391"
     networks:
       - lis-server_app_net
     restart: unless-stopped
