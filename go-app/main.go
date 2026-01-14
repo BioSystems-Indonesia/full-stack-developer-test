@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -222,6 +223,46 @@ func main() {
 			writeError(w, newResponseError(http.StatusMethodNotAllowed, "method not allowed"))
 			return
 		}
+	})
+
+	// serve OpenAPI spec file
+	mux.HandleFunc("/openapi.yaml", func(w http.ResponseWriter, r *http.Request) {
+		data, err := os.ReadFile("../openapi.yaml")
+		if err != nil {
+			writeError(w, newResponseError(http.StatusNotFound, "openapi spec not found"))
+			return
+		}
+		w.Header().Set("Content-Type", "application/x-yaml")
+		w.WriteHeader(http.StatusOK)
+		w.Write(data)
+	})
+
+	// serve Swagger-like documentation page (uses CDN-hosted swagger-ui)
+	mux.HandleFunc("/documentations", func(w http.ResponseWriter, r *http.Request) {
+		html := `<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Patients API Docs</title>
+		<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@4/swagger-ui.css" />
+	</head>
+	<body>
+		<div id="swagger-ui"></div>
+		<script src="https://unpkg.com/swagger-ui-dist@4/swagger-ui-bundle.js"></script>
+		<script>
+			window.onload = function() {
+				SwaggerUIBundle({
+					url: '/openapi.yaml',
+					dom_id: '#swagger-ui',
+				});
+			};
+		</script>
+	</body>
+</html>`
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(html))
 	})
 
 	// wrap mux with CORS middleware to allow requests from any origin
